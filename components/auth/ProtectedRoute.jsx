@@ -29,9 +29,11 @@ export default function ProtectedRoute({
         .eq("id", user.id)
         .single();
 
+      const role = profile?.role || user.user_metadata?.role;
+
       if (
         allowedRoles.length > 0 &&
-        !allowedRoles.includes(profile?.role)
+        !allowedRoles.includes(role)
       ) {
         router.replace("/dashboard");
         return;

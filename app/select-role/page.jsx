@@ -22,10 +22,18 @@ function SelectRoleContent() {
       setLoading(role);
       setError("");
       try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+
         const { error: updateError } = await supabase.auth.updateUser({
           data: { role },
         });
         if (updateError) throw updateError;
+
+        await supabase
+          .from("profiles")
+          .upsert({ id: user.id, role }, { onConflict: "id" });
+
         router.replace(role === "vendor" ? "/dashboard/vendor" : "/dashboard/buyer");
       } catch {
         setError("Something went wrong. Please try again.");
