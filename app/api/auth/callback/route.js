@@ -7,7 +7,21 @@ export async function GET(request) {
   const code = requestUrl.searchParams.get("code");
   const error = requestUrl.searchParams.get("error");
   const errorDescription = requestUrl.searchParams.get("error_description");
-  const origin = requestUrl.origin;
+
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+  const host = request.headers.get("host");
+
+  let origin;
+  if (forwardedHost && !forwardedHost.includes("0.0.0.0")) {
+    origin = `${forwardedProto}://${forwardedHost}`;
+  } else if (host && !host.includes("0.0.0.0") && !host.includes("localhost")) {
+    origin = `${forwardedProto}://${host}`;
+  } else if (process.env.REPLIT_DEV_DOMAIN) {
+    origin = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  } else {
+    origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  }
 
   if (error) {
     return NextResponse.redirect(
