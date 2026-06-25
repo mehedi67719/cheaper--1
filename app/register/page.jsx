@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import AuthShell from "@/components/auth/AuthShell";
 import AuthCard from "@/components/auth/AuthCard";
@@ -9,7 +9,7 @@ import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
 import PasswordStrength from "@/components/auth/PasswordStrength";
 import { register } from "@/lib/auth";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const role = searchParams.get("role") || "buyer";
@@ -23,7 +23,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const roleLabel = useMemo(() => (role === "vendor" ? "Vendor" : "Buyer"), [role]);
+  const roleLabel = useMemo(() => (role === "vendor" ? "Seller" : "Buyer"), [role]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,14 +53,14 @@ export default function RegisterPage() {
     <AuthShell>
       <AuthCard
         title={`Create ${roleLabel} Account`}
-        subtitle="Join Cheaper and start sourcing smarter."
+        subtitle="Join Cheaper — it's free and takes 2 minutes."
       >
         <SocialLoginButtons />
 
-        <div className="my-6 flex items-center gap-4">
-          <div className="h-px flex-1 bg-gray-200" />
-          <span className="text-xs font-semibold text-gray-400">OR CONTINUE WITH EMAIL</span>
-          <div className="h-px flex-1 bg-gray-200" />
+        <div className="my-5 flex items-center gap-3">
+          <div className="h-px flex-1 bg-[#e2ddd6]" />
+          <span className="text-xs font-medium text-[#aaa]">or continue with email</span>
+          <div className="h-px flex-1 bg-[#e2ddd6]" />
         </div>
 
         {error && (
@@ -69,25 +69,23 @@ export default function RegisterPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="text"
             placeholder="Full name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             required
-            className="h-12 w-full rounded-xl border border-gray-200 px-4 outline-none focus:border-black"
+            className="h-11 w-full rounded-lg border border-[#e2ddd6] px-4 text-sm outline-none focus:border-[#111] text-[#111] placeholder:text-[#bbb] transition-colors"
           />
-
           <input
             type="email"
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="h-12 w-full rounded-xl border border-gray-200 px-4 outline-none focus:border-black"
+            className="h-11 w-full rounded-lg border border-[#e2ddd6] px-4 text-sm outline-none focus:border-[#111] text-[#111] placeholder:text-[#bbb] transition-colors"
           />
-
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -95,57 +93,70 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="h-12 w-full rounded-xl border border-gray-200 px-4 pr-16 outline-none focus:border-black"
+              autoComplete="new-password"
+              className="h-11 w-full rounded-lg border border-[#e2ddd6] px-4 pr-16 text-sm outline-none focus:border-[#111] text-[#111] placeholder:text-[#bbb] transition-colors"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#888] hover:text-[#111] transition-colors"
             >
               {showPassword ? "Hide" : "Show"}
             </button>
           </div>
-
           <input
             type="password"
             placeholder="Confirm password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className="h-12 w-full rounded-xl border border-gray-200 px-4 outline-none focus:border-black"
+            autoComplete="new-password"
+            className="h-11 w-full rounded-lg border border-[#e2ddd6] px-4 text-sm outline-none focus:border-[#111] text-[#111] placeholder:text-[#bbb] transition-colors"
           />
 
           <PasswordStrength password={password} />
 
-          <label className="flex items-start gap-3 text-sm text-gray-500 cursor-pointer">
+          <label className="flex items-start gap-3 text-sm text-[#888] cursor-pointer pt-1">
             <input
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded"
+              className="mt-0.5 h-4 w-4 rounded accent-[#111]"
             />
             <span>
-              I agree to Cheaper&apos;s{" "}
-              <Link href="#" className="font-semibold text-black">Terms</Link>{" "}
+              I agree to Cheaper's{" "}
+              <Link href="#" className="font-semibold text-[#111] hover:underline">Terms</Link>{" "}
               and{" "}
-              <Link href="#" className="font-semibold text-black">Privacy Policy</Link>.
+              <Link href="#" className="font-semibold text-[#111] hover:underline">Privacy Policy</Link>.
             </span>
           </label>
 
           <button
             type="submit"
             disabled={loading}
-            className="h-12 w-full rounded-xl bg-black font-semibold text-white transition hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="h-11 w-full rounded-lg bg-[#111] font-semibold text-white text-sm hover:bg-[#333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? "Creating account..." : `Create ${roleLabel} Account`}
+            {loading ? "Creating account…" : `Create ${roleLabel} Account`}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-5 text-center text-sm text-[#888]">
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-black">Sign In</Link>
+          <Link href="/login" className="font-semibold text-[#111] hover:underline">Sign in</Link>
         </p>
       </AuthCard>
     </AuthShell>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f3ef]">
+        <div className="w-7 h-7 border-2 border-[#111] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
   );
 }
