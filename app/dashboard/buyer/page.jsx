@@ -354,7 +354,7 @@ export default function BuyerDashboard() {
                               <span className="font-bold text-[#111] text-sm">${product.price}</span>
                               <span className="text-[#bbb] text-xs line-through">${product.was}</span>
                             </div>
-                            <button className="text-xs font-semibold text-[#4648d4] hover:underline">Buy →</button>
+                            <Link href={`/products/${product.id}`} className="text-xs font-semibold text-[#4648d4] hover:underline">View →</Link>
                           </div>
                         </div>
                       </div>

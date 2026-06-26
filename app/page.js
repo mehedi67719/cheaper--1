@@ -26,10 +26,10 @@ const integrations = [
 ];
 
 const featured = [
-  { name: "Wireless Earbuds Pro", price: "$29.99", was: "$59.99", seller: "TechHub Store", rating: 4.8, reviews: 342, pct: "50" },
-  { name: "Linen Throw Blanket", price: "$18.00", was: "$36.00", seller: "CozyNest Shop", rating: 4.9, reviews: 128, pct: "50" },
-  { name: "Running Shoes X2", price: "$44.99", was: "$89.99", seller: "SportZone", rating: 4.7, reviews: 215, pct: "50" },
-  { name: "Ceramic Mug Set (4)", price: "$12.50", was: "$24.00", seller: "HomeGoods Co.", rating: 5.0, reviews: 87, pct: "48" },
+  { id: 1, name: "Wireless Earbuds Pro", price: "$29.99", was: "$59.99", seller: "TechHub Store", rating: 4.8, reviews: 342, pct: "50" },
+  { id: 2, name: "Linen Throw Blanket", price: "$18.00", was: "$36.00", seller: "CozyNest Shop", rating: 4.9, reviews: 128, pct: "50" },
+  { id: 3, name: "Running Shoes X2", price: "$44.99", was: "$89.99", seller: "SportZone", rating: 4.7, reviews: 215, pct: "50" },
+  { id: 4, name: "Ceramic Mug Set (4)", price: "$12.50", was: "$24.00", seller: "HomeGoods Co.", rating: 5.0, reviews: 87, pct: "48" },
 ];
 
 export default function HomePage() {
@@ -137,8 +137,8 @@ export default function HomePage() {
               </a>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {featured.map(({ name, price, was, seller, rating, reviews, pct }) => (
-                <div key={name} className="border border-[#e2ddd6] rounded-xl overflow-hidden hover:border-[#999] hover:shadow-md transition-all cursor-pointer group bg-white">
+              {featured.map(({ id, name, price, was, seller, rating, reviews, pct }) => (
+                <Link key={name} href={`/products/${id}`} className="border border-[#e2ddd6] rounded-xl overflow-hidden hover:border-[#999] hover:shadow-md transition-all cursor-pointer group bg-white">
                   <div className="h-40 bg-[#f5f3ef] relative flex items-center justify-center">
                     <Package size={40} className="text-[#ccc]" />
                     <span className="absolute top-3 left-3 bg-[#111] text-white text-[10px] font-bold px-2 py-0.5 rounded">{pct}% off</span>
@@ -156,10 +156,10 @@ export default function HomePage() {
                         <span className="font-bold text-[#111]">{price}</span>
                         <span className="text-[#bbb] text-xs line-through">{was}</span>
                       </div>
-                      <button className="text-xs font-semibold text-[#4648d4] hover:underline">Buy →</button>
+                      <span className="text-xs font-semibold text-[#4648d4]">View →</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
