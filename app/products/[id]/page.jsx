@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Star, Heart, ShoppingBag, Package, Store,
   Shield, Truck, RefreshCw, ChevronRight, Share2, Flag,
-  Check, Minus, Plus, ExternalLink, Loader2,
+  Check, Minus, Plus, ExternalLink, Loader2, ShoppingCart,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useCart } from "@/lib/cart-context";
 
 const MOCK_PRODUCTS = {
   "1": {
@@ -106,10 +107,23 @@ export default function ProductPage({ params }) {
   const [dbLoading, setDbLoading] = useState(!MOCK_PRODUCTS[String(id)]);
   const [notFound, setNotFound] = useState(false);
 
+  const { addItem, count: cartCount } = useCart();
   const [wishlisted, setWishlisted] = useState(false);
   const [qty, setQty] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
   const [copied, setCopied] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  const handleBuyNow = () => {
+    addItem(product, qty);
+    router.push("/checkout");
+  };
+
+  const handleAddToCart = () => {
+    addItem(product, qty);
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
 
   useEffect(() => {
     if (MOCK_PRODUCTS[String(id)]) return;

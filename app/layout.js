@@ -1,5 +1,6 @@
 import { Inter, Hanken_Grotesk } from "next/font/google";
 import MaterialSymbols from "@/components/MaterialSymbols";
+import Providers from "./providers";
 import "./globals.css";
 
 const inter = Inter({
@@ -26,7 +27,7 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${inter.variable} ${hanken.variable} h-full`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
         <MaterialSymbols />
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
