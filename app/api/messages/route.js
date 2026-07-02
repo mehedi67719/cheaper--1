@@ -45,3 +45,41 @@ export async function POST(request) {
     );
   }
 }
+
+
+
+export async function GET(request) {
+  try {
+    const supabase = await createClient();
+
+    const { searchParams } = new URL(request.url);
+    const conversationId = searchParams.get("conversationId");
+
+    if (!conversationId) {
+      return NextResponse.json(
+        { message: "conversationId is required" },
+        { status: 400 }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      return NextResponse.json(
+        { message: error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { message: error.message },
+      { status: 500 }
+    );
+  }
+}

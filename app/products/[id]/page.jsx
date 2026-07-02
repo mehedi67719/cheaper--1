@@ -7,9 +7,11 @@ import {
   ArrowLeft, Star, Heart, ShoppingBag, Package, Store,
   Shield, Truck, RefreshCw, ChevronRight, Share2, Flag,
   Check, Minus, Plus, ExternalLink, Loader2, ShoppingCart,
+  MessageCircle, Mail, Phone, MapPin, Clock, Award, User
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useCart } from "@/lib/cart-context";
+import useAuth from "@/hooks/useAuth";
 
 const MOCK_PRODUCTS = {
   "1": {
@@ -18,6 +20,15 @@ const MOCK_PRODUCTS = {
     description: "Premium wireless earbuds with active noise cancellation, 30-hour battery life, and IPX5 water resistance. Crystal-clear audio with deep bass and crisp highs. Seamlessly pair with any Bluetooth 5.3 device.",
     features: ["Active Noise Cancellation", "30-hour battery (10hr buds + 20hr case)", "IPX5 water resistant", "Bluetooth 5.3", "USB-C charging", "Touch controls"],
     specs: { "Connectivity": "Bluetooth 5.3", "Battery": "10hr (buds) + 20hr (case)", "Water Rating": "IPX5", "Driver Size": "10mm", "Weight": "5g per earbud" },
+    vendor_id: "vendor-123",
+    seller_email: "techhub@example.com",
+    seller_phone: "+1 (555) 123-4567",
+    seller_location: "San Francisco, CA",
+    seller_verified: true,
+    seller_join_date: "2024",
+    seller_total_products: 156,
+    seller_response_time: "2-4 hours",
+    seller_about: "Premium electronics retailer with 5+ years of experience. We specialize in high-quality gadgets and accessories."
   },
   "2": {
     id: "2", name: "Linen Throw Blanket", vendor_name: "CozyNest Shop", sellerRating: 4.9, sellerSales: "3.1k",
@@ -25,48 +36,15 @@ const MOCK_PRODUCTS = {
     description: "Handwoven 100% French linen throw blanket. Naturally breathable, hypoallergenic, and gets softer with every wash. Perfect for sofa draping or light bedding. Available in earthy, neutral tones.",
     features: ["100% French linen", "Hypoallergenic", "Pre-washed & softened", "Machine washable", "140 × 200cm", "Ethically made"],
     specs: { "Material": "100% French Linen", "Size": "140 × 200 cm", "Weight": "450g", "Care": "Machine wash 40°C", "Origin": "Portugal" },
-  },
-  "3": {
-    id: "3", name: "Running Shoes X2", vendor_name: "SportZone", sellerRating: 4.7, sellerSales: "8.9k",
-    price: 44.99, original_price: 89.99, rating: 4.7, reviews: 215, category: "Sports",
-    description: "Lightweight responsive running shoes with our proprietary CloudFoam sole technology. Breathable mesh upper with a secure lace system. Designed for road and light trail running.",
-    features: ["CloudFoam sole", "Breathable mesh upper", "Reflective detailing", "Wide toe box", "Sizes 36–48", "6 colour options"],
-    specs: { "Upper": "Engineered Mesh", "Sole": "CloudFoam EVA", "Drop": "8mm", "Weight": "240g (size 42)", "Surface": "Road / Light Trail" },
-  },
-  "4": {
-    id: "4", name: "Ceramic Mug Set (4)", vendor_name: "HomeGoods Co.", sellerRating: 4.8, sellerSales: "5.6k",
-    price: 12.50, original_price: 24.00, rating: 5.0, reviews: 87, category: "Home",
-    description: "Set of four hand-glazed ceramic mugs with a speckled finish. Each holds 350ml and is microwave and dishwasher safe. A modern update to your morning ritual.",
-    features: ["Set of 4 mugs", "350ml capacity", "Hand-glazed ceramic", "Microwave safe", "Dishwasher safe", "Speckled matte finish"],
-    specs: { "Material": "Stoneware Ceramic", "Capacity": "350ml each", "Set Size": "4 mugs", "Care": "Dishwasher safe", "Dimensions": "9cm H × 8cm W" },
-  },
-  "5": {
-    id: "5", name: "Standing Desk Pro", vendor_name: "WorkSpace Co.", sellerRating: 4.7, sellerSales: "2.3k",
-    price: 249.99, original_price: 349.99, rating: 4.7, reviews: 203, category: "Office",
-    description: "Electric height-adjustable standing desk with memory presets. Solid bamboo top surface, quiet dual motor, anti-collision system, and cable management tray included.",
-    features: ["Electric height adjust", "4 memory presets", "Dual-motor lift system", "Anti-collision", "Bamboo surface", "Cable tray included"],
-    specs: { "Surface": "Bamboo (1.8m × 0.8m)", "Height Range": "60–125cm", "Weight Capacity": "80kg", "Motor": "Dual 350W", "Noise Level": "<45dB" },
-  },
-  "6": {
-    id: "6", name: "Air Purifier HEPA", vendor_name: "CleanAir Shop", sellerRating: 4.9, sellerSales: "1.8k",
-    price: 89.00, original_price: 129.00, rating: 4.9, reviews: 87, category: "Home",
-    description: "True HEPA H13 air purifier covering up to 50m². Removes 99.97% of particles including dust, pollen, pet dander, and smoke. Three fan speeds with auto mode and sleep mode.",
-    features: ["True HEPA H13 filter", "Covers 50m²", "99.97% particle removal", "Auto + sleep mode", "Filter life indicator", "Ultra quiet at 25dB"],
-    specs: { "Coverage": "50m²", "Filter": "True HEPA H13", "Noise": "25–52dB", "Power": "55W", "Dimensions": "32 × 32 × 56cm" },
-  },
-  "7": {
-    id: "7", name: "Leather Wallet Slim", vendor_name: "Craft & Co.", sellerRating: 4.6, sellerSales: "4.1k",
-    price: 34.00, original_price: 54.00, rating: 4.6, reviews: 145, category: "Fashion",
-    description: "Full-grain vegetable-tanned leather slim wallet. Holds 6–8 cards and folded bills. Develops a unique patina over time. RFID blocking. Handcrafted in small batches.",
-    features: ["Full-grain leather", "RFID blocking", "6–8 card slots", "Bill compartment", "Develops patina", "Handcrafted"],
-    specs: { "Material": "Vegetable-tanned leather", "Dimensions": "9 × 11cm (folded)", "Cards": "6–8", "RFID": "Yes", "Origin": "Handcrafted in Italy" },
-  },
-  "8": {
-    id: "8", name: "Smart Plug (4-pack)", vendor_name: "TechHub Store", sellerRating: 4.9, sellerSales: "12.4k",
-    price: 19.99, original_price: 29.99, rating: 4.8, reviews: 412, category: "Electronics",
-    description: "Wi-Fi smart plugs with energy monitoring. Works with Alexa, Google Home, and HomeKit. Schedule, automate, and control devices remotely from your phone. No hub required.",
-    features: ["Works with Alexa, Google, HomeKit", "Energy monitoring", "Remote control via app", "Scheduling & automation", "16A per plug", "No hub needed"],
-    specs: { "Pack Size": "4 plugs", "Max Load": "16A / 3680W", "Connectivity": "Wi-Fi 2.4GHz", "Compatibility": "Alexa, Google, HomeKit", "App": "iOS & Android" },
+    vendor_id: "vendor-456",
+    seller_email: "cozynest@example.com",
+    seller_phone: "+1 (555) 987-6543",
+    seller_location: "Portland, OR",
+    seller_verified: true,
+    seller_join_date: "2023",
+    seller_total_products: 89,
+    seller_response_time: "1-3 hours",
+    seller_about: "We create beautiful home decor items that bring comfort and style to your space."
   },
 };
 
@@ -82,6 +60,7 @@ function normalizeProduct(raw) {
     id: raw.id,
     name: raw.name,
     vendor_name: raw.vendor_name || "Marketplace Seller",
+    vendor_id: raw.vendor_id || raw.vendorId || "unknown-vendor",
     sellerRating: 4.8,
     sellerSales: "—",
     price: parseFloat(raw.price),
@@ -93,12 +72,21 @@ function normalizeProduct(raw) {
     features: Array.isArray(raw.features) ? raw.features : [],
     specs: raw.specs && typeof raw.specs === "object" ? raw.specs : {},
     stock: raw.stock ?? 0,
+    seller_email: raw.seller_email || raw.sellerEmail || "seller@example.com",
+    seller_phone: raw.seller_phone || raw.sellerPhone || "+1 (555) 000-0000",
+    seller_location: raw.seller_location || raw.sellerLocation || "Location not specified",
+    seller_verified: raw.seller_verified ?? raw.sellerVerified ?? false,
+    seller_join_date: raw.seller_join_date || raw.sellerJoinDate || "2024",
+    seller_total_products: raw.seller_total_products || raw.sellerTotalProducts || 0,
+    seller_response_time: raw.seller_response_time || raw.sellerResponseTime || "24 hours",
+    seller_about: raw.seller_about || raw.sellerAbout || "Seller information not available.",
   };
 }
 
 export default function ProductPage({ params }) {
   const { id } = use(params);
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
 
   const [product, setProduct] = useState(() => {
     const mock = MOCK_PRODUCTS[String(id)];
@@ -106,6 +94,7 @@ export default function ProductPage({ params }) {
   });
   const [dbLoading, setDbLoading] = useState(!MOCK_PRODUCTS[String(id)]);
   const [notFound, setNotFound] = useState(false);
+  const [contactLoading, setContactLoading] = useState(false);
 
   const { addItem, count: cartCount } = useCart();
   const [wishlisted, setWishlisted] = useState(false);
@@ -123,6 +112,63 @@ export default function ProductPage({ params }) {
     addItem(product, qty);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  // Contact Seller Handler - Navigates directly to Messages page
+  const handleContactSeller = async () => {
+    if (!user) {
+      alert("Please login to contact the seller.");
+      router.push("/login");
+      return;
+    }
+
+    setContactLoading(true);
+
+    try {
+      const buyerId = user.id || user.userId;
+      const sellerId = product?.vendor_id;
+      const productId = product?.id;
+
+      console.log("=== Contact Seller ===");
+      console.log("Product ID:", productId);
+      console.log("Vendor ID:", sellerId);
+      console.log("Product Name:", product?.name);
+      console.log("Vendor Name:", product?.vendor_name);
+      console.log("Buyer ID:", buyerId);
+      console.log("=== End Contact Seller ===");
+
+      // Step 1: Create or get conversation
+      const conversationResponse = await fetch("/api/conversations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          buyer_id: buyerId,
+          seller_id: sellerId,
+          product_id: productId,
+        }),
+      });
+
+      if (!conversationResponse.ok) {
+        const errorData = await conversationResponse.json();
+        throw new Error(errorData.message || "Failed to create conversation");
+      }
+
+      const conversationData = await conversationResponse.json();
+      const conversationId = conversationData.id;
+
+      console.log("Conversation created/found:", conversationData);
+
+      // Step 2: Navigate directly to messages page with conversation ID
+      router.push(`/messages?conversationId=${conversationId}`);
+
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      alert(`Failed to start conversation: ${error.message}`);
+    } finally {
+      setContactLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -151,7 +197,7 @@ export default function ProductPage({ params }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (dbLoading) {
+  if (dbLoading || authLoading) {
     return (
       <div className="min-h-screen bg-[#f5f3ef] flex items-center justify-center" style={{ fontFamily: "var(--font-inter), sans-serif" }}>
         <Loader2 size={24} className="animate-spin text-[#ccc]" />
@@ -196,12 +242,20 @@ export default function ProductPage({ params }) {
               <span className="text-[#111] font-medium truncate max-w-[160px]">{product.name}</span>
             </div>
           </div>
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-[#111] flex items-center justify-center">
-              <span className="text-white font-bold text-xs" style={{ fontFamily: "var(--font-hanken), sans-serif" }}>C</span>
-            </div>
-            <span className="font-bold text-sm hidden sm:block" style={{ fontFamily: "var(--font-hanken), sans-serif" }}>Cheaper</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            {user && (
+              <div className="flex items-center gap-2 text-xs text-[#888]">
+                <User size={14} />
+                <span className="hidden sm:inline">{user.email || user.name}</span>
+              </div>
+            )}
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-md bg-[#111] flex items-center justify-center">
+                <span className="text-white font-bold text-xs" style={{ fontFamily: "var(--font-hanken), sans-serif" }}>C</span>
+              </div>
+              <span className="font-bold text-sm hidden sm:block" style={{ fontFamily: "var(--font-hanken), sans-serif" }}>Cheaper</span>
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -440,13 +494,40 @@ export default function ProductPage({ params }) {
               </div>
 
               {/* CTAs */}
-              <button className="w-full bg-[#111] text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-[#333] transition-colors flex items-center justify-center gap-2 mb-3">
+              <button onClick={handleBuyNow} className="w-full bg-[#111] text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-[#333] transition-colors flex items-center justify-center gap-2 mb-3">
                 <ShoppingBag size={16} />
                 Buy now · ${(product.price * qty).toFixed(2)}
               </button>
               <button
+                onClick={handleAddToCart}
+                className="w-full bg-white border border-[#e2ddd6] py-3.5 rounded-xl font-semibold text-sm text-[#555] hover:border-[#999] transition-colors flex items-center justify-center gap-2"
+              >
+                <ShoppingCart size={16} />
+                {addedToCart ? "Added!" : "Add to cart"}
+              </button>
+
+              {/* Contact Seller Button - Now navigates directly to Messages */}
+              <button
+                onClick={handleContactSeller}
+                disabled={contactLoading}
+                className="w-full mt-3 bg-[#4648d4] text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-[#3537b8] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {contactLoading ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <MessageCircle size={16} />
+                    Contact Seller
+                  </>
+                )}
+              </button>
+
+              <button
                 onClick={() => setWishlisted(w => !w)}
-                className={`w-full py-3.5 rounded-xl font-semibold text-sm border transition-all flex items-center justify-center gap-2 ${
+                className={`w-full py-3.5 rounded-xl font-semibold text-sm border transition-all flex items-center justify-center gap-2 mt-2 ${
                   wishlisted
                     ? "bg-red-50 border-red-200 text-red-600"
                     : "bg-white border-[#e2ddd6] text-[#555] hover:border-[#999]"
@@ -473,13 +554,20 @@ export default function ProductPage({ params }) {
 
             {/* Seller card */}
             <div className="bg-white border border-[#e2ddd6] rounded-2xl p-5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#111] flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-xs font-bold">{(product.vendor_name || "S")[0]}</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-sm text-[#111]">{product.vendor_name}</div>
+                    <div className="flex items-center gap-2">
+                      <div className="font-semibold text-sm text-[#111]">{product.vendor_name}</div>
+                      {product.seller_verified && (
+                        <div className="flex items-center gap-0.5 bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full text-[8px] font-semibold">
+                          <Check size={8} /> Verified
+                        </div>
+                      )}
+                    </div>
                     <div className="flex items-center gap-1 mt-0.5">
                       <Star size={11} className="text-amber-500 fill-amber-500" />
                       <span className="text-xs font-bold text-[#111]">{product.sellerRating}</span>
@@ -493,6 +581,44 @@ export default function ProductPage({ params }) {
                   Visit <ExternalLink size={11} />
                 </button>
               </div>
+
+              {/* Seller Details */}
+              <div className="border-t border-[#f0ede8] pt-3 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs text-[#888]">
+                  <Clock size={12} /> Response: {product.seller_response_time}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-[#888]">
+                  <Package size={12} /> {product.seller_total_products} products
+                </div>
+                <div className="flex items-center gap-2 text-xs text-[#888]">
+                  <MapPin size={12} /> {product.seller_location}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-[#888]">
+                  <Mail size={12} /> {product.seller_email}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-[#888]">
+                  <Phone size={12} /> {product.seller_phone}
+                </div>
+              </div>
+
+              {/* Contact Seller Button in Seller Card */}
+              <button 
+                onClick={handleContactSeller}
+                disabled={contactLoading}
+                className="w-full mt-3 bg-[#4648d4] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-[#3537b8] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {contactLoading ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <MessageCircle size={14} />
+                    Contact {product.vendor_name}
+                  </>
+                )}
+              </button>
             </div>
 
             {/* Related products */}
